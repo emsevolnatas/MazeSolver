@@ -1,5 +1,7 @@
+import java.util.PriorityQueue;
+import java.util.Queue;
+
 Maze maze;
-Graph graph;
 ArrayList<Node> alNodes = new ArrayList<Node>();
 float cellsize;
 ArrayList<Node> solution = new ArrayList<Node>();
@@ -7,8 +9,11 @@ ArrayList<Node> solution = new ArrayList<Node>();
 void setup() {
  maze = new Maze("normal.png");
  println("***** MAZE   LOADED *****");
- graph = new Graph(maze);
- println("***** GRAPH  LOADED *****");
+ for(Cell c : maze.alCell)
+  if(c.neighbours!=5&&c.neighbours!=10) alNodes.add(new Node(c));
+     
+ for(Node n : alNodes) n.initAdjacentNodes();
+ println("***** NODES  LOADED *****");
  size(1000, 1000, P2D);
 }
 
@@ -19,8 +24,10 @@ void draw() {
    n.show();
  }
 } 
- // Dijkstra Shit 
- ArrayList<Node> getShortestPathToEnd() {
+
+
+ // Dijkstra
+ ArrayList<Node> dijkstraSolve() {
    Node source = maze.entry.node;
    Node current;
    Node next;
@@ -40,7 +47,8 @@ void draw() {
        if(!settled.contains(next)) {
          calculateMinimumDistance(next, cost, current);
          unsettled.add(next);
-       } 
+       }
+       if(settled.contains(maze.exit.node)) return maze.exit.node.shortestPath;
      }
      settled.add(current);
    } 
@@ -70,4 +78,45 @@ void calculateMinimumDistance(Node eval, Integer cost, Node source) {
     shortestPath.add(source);
     eval.shortestPath = shortestPath;
   }
+}
+
+// A* baby
+ArrayList<Node> reconstructPath(Node current, HashMap<Node,Node> cameFrom) {
+  ArrayList<Node> path = new ArrayList<Node>();
+  path.add(current);
+  while(cameFrom.containsKey(current)) {
+    current = cameFrom.get(current);
+    path.add(current);
+  }
+  return path;
+}
+
+ArrayList<Node> aStarSolve(Node start, Node end) {
+    HashMap<Node,Node> cameFrom = new HashMap<Node,Node>();
+    PriorityQueue<Node> openList = new PriorityQueue<Node>();
+    openList.add(start);
+    start.distance = 0;
+    start.predictedDistance = estimateDistance(start);
+    
+    while(!openList.isEmpty()) {
+     Node current = openList.poll();
+     if(current == end) return reconstructPath(current, cameFrom);
+     openList.remove(current);
+     for(HashMap.Entry<Node,Integer> entry : current.adjacentNodes.entrySet()) {
+       int tentative = current.distance;
+       Node neighbour = entry.getKey();
+       if(tentative < neighbour.distance) {
+         if(cameFrom.containsKey(neighbour)) cameFrom.remove(neighbour);
+         cameFrom.put(neighbour,current);
+         neighbour.distance = tentative;
+         neighbour.predictedDistance = current.distance + estimateDistance(neighbour); 
+         if(!openList.contains(neighbour)) openList.add(neighbour);
+       }
+     }
+   }
+   return  new ArrayList<Node>();
+}
+
+int estimateDistance(Node n1) {
+  return round(sqrt(abs(n1.cell.x+maze.exit.x)^2+abs(n1.cell.y+maze.exit.y)^2));
 }

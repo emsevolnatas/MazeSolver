@@ -1,5 +1,6 @@
 void keyPressed() {
-  if(key == 'R') {
-    solution = getShortestPathToEnd();
+  if(key == ' ') {
+    solution = aStarSolve(maze.entry.node,maze.exit.node);
+    solution.add(maze.exit.node);
   }
 }

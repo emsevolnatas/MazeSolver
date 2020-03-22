@@ -1,8 +1,10 @@
-class Node {
+class Node implements Comparable {
   Cell cell;
   color col = #00FF00;
   ArrayList<Node> shortestPath = new ArrayList<Node>();
+
   Integer distance = Integer.MAX_VALUE;
+  Integer predictedDistance = Integer.MAX_VALUE;
   
   HashMap<Node, Integer> adjacentNodes = new HashMap<Node, Integer>();
   float centerX, centerY;
@@ -70,9 +72,17 @@ class Node {
     }
   }
   
+  public int compareTo(Object other) { 
+    Node otherNode = null;
+    if(other.getClass() == this.getClass()) otherNode = (Node) other; 
+    if(this.predictedDistance < otherNode.predictedDistance) return 1;
+    else if ( this.predictedDistance == otherNode.predictedDistance ) return 0;    
+    return -1;
+  }
+  
   void show() {
     fill(col);
-    if(graph.maze.exit.node.shortestPath.contains(this) || maze.exit.node == this) fill(#0000FF); 
+    if(maze.exit.node.shortestPath.contains(this) || maze.exit.node == this) fill(#0000FF); 
     strokeWeight(0);
     circle(this.centerX,this.centerY, cellsize/2-1);
     for(HashMap.Entry<Node, Integer> entry : adjacentNodes.entrySet()) {
