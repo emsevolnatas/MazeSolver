@@ -91,7 +91,9 @@ ArrayList<Node> reconstructPath(Node current, HashMap<Node,Node> cameFrom) {
   return path;
 }
 
-ArrayList<Node> aStarSolve(Node start, Node end) {
+ArrayList<Node> aStarSolve() {
+    Node start = maze.entry.node;
+    Node end = maze.exit.node;
     HashMap<Node,Node> cameFrom = new HashMap<Node,Node>();
     PriorityQueue<Node> openList = new PriorityQueue<Node>();
     openList.add(start);
