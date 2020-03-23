@@ -7,7 +7,7 @@ float cellsize;
 ArrayList<Node> solution = new ArrayList<Node>();
 
 void setup() {
- maze = new Maze("normal.png");
+ maze = new Maze("perfect2k.png");
  println("***** MAZE   LOADED *****");
  for(Cell c : maze.alCell)
   if(c.neighbours!=5&&c.neighbours!=10) alNodes.add(new Node(c));
@@ -119,6 +119,6 @@ ArrayList<Node> aStarSolve() {
    return  new ArrayList<Node>();
 }
 
-int estimateDistance(Node n1) {
-  return round(sqrt(abs(n1.cell.x+maze.exit.x)^2+abs(n1.cell.y+maze.exit.y)^2));
+int estimateDistance(Node n) {
+  return round(sqrt(abs(n.cell.x+maze.exit.x)^2+abs(n.cell.y+maze.exit.y)^2));
 }
